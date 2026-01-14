@@ -12,11 +12,8 @@ IF %ERRORLEVEL% NEQ 0 (
   exit /b
 )
 
-:: 0. Limpiar bloqueos anteriores si existen
-IF EXIST ".git\index.lock" (
-  echo Detectado bloqueo anterior de Git. Limpiando...
-  del ".git\index.lock"
-)
+:: 0. Limpiar bloqueos anteriores
+IF EXIST ".git\index.lock" del ".git\index.lock"
 
 :: 1. Inicializar si no existe
 IF NOT EXIST ".git" (
@@ -33,10 +30,9 @@ IF NOT EXIST ".git" (
   )
 )
 
-:: 1.5 Configurar identidad si falta (Solo para este repo)
+:: 1.5 Configurar identidad
 git config user.name >nul 2>nul
 IF %ERRORLEVEL% NEQ 0 (
-  echo Configurando usuario Git local...
   git config user.name "Portfolio User"
   git config user.email "portfolio@local.dev"
 )
@@ -50,8 +46,9 @@ echo 3. Guardando cambios locales...
 git commit -m "Deploy: Subida automatica correcciones"
 echo.
 
-echo 4. Subiendo a GitHub...
-git push -u origin main
+echo 4. Subiendo a GitHub (Forzando actualizacion)...
+:: Usamos --force para sobrescribir cualquier conflicto en el servidor
+git push -u origin main --force
 echo.
 
 IF %ERRORLEVEL% EQU 0 (
@@ -62,7 +59,7 @@ IF %ERRORLEVEL% EQU 0 (
 ) ELSE (
   echo ==========================================
   echo    ERROR: Algo fallo al subir.
-  echo    Puede que necesites loguearte en GitHub.
+  echo    Asegurate de completar el login en el navegador si te lo pide.
   echo ==========================================
 )
 
